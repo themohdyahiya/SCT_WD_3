@@ -1,2 +1,2 @@
 # SCT_WD_3
-tic tac toe
+tic tac toe created using HTML, CSS, JS
