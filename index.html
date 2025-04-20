@@ -1,129 +1,196 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tic-Tac-Toe</title>
-    <style>
-        body {
-            text-align: center;
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 20px;
-        }
-        h1 {
-            color: #333;
-        }
-        .board {
-            display: grid;
-            grid-template-columns: repeat(3, 100px);
-            grid-template-rows: repeat(3, 100px);
-            gap: 5px;
-            justify-content: center;
-            margin: 20px auto;
-            background: #fff;
-            padding: 10px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 320px;
-        }
-        .cell {
-            width: 100px;
-            height: 100px;
-            font-size: 2em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid #333;
-            cursor: pointer;
-            background: #fff;
-            border-radius: 5px;
-            transition: background 0.3s;
-        }
-        .cell:hover {
-            background: #ddd;
-        }
-        .cell.taken {
-            cursor: not-allowed;
-        }
-        #status {
-            font-size: 1.5em;
-            margin-top: 20px;
-            color: #333;
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 1em;
-            border: none;
-            background: #28a745;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        button:hover {
-            background: #218838;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tic-Tac-Toe</title>
+  <style>
+    body {
+      text-align: center;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    .input-container {
+      margin-bottom: 20px;
+    }
+
+    input {
+      padding: 8px 10px;
+      margin: 0 10px;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 5px;
+      justify-content: center;
+      margin: 20px auto;
+      background: #fff;
+      padding: 10px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 320px;
+    }
+
+    .cell {
+      width: 100px;
+      height: 100px;
+      font-size: 2em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #333;
+      cursor: pointer;
+      background: #fff;
+      border-radius: 5px;
+      transition: background 0.3s;
+    }
+
+    .cell:hover {
+      background: #ddd;
+    }
+
+    .cell.taken {
+      cursor: not-allowed;
+    }
+
+    #status {
+      font-size: 1.5em;
+      margin-top: 20px;
+      color: #333;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 1em;
+      border: none;
+      background: #007bff;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+      margin: 10px 5px;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    #game-area {
+      display: none;
+    }
+  </style>
 </head>
 <body>
-    <h1>Tic-Tac-Toe</h1>
+
+  <h1>Tic-Tac-Toe</h1>
+
+  <div class="input-container">
+    <input type="text" id="playerX" placeholder="Player X name" />
+    <input type="text" id="playerO" placeholder="Player O name" />
+    <button onclick="startGame()">Start Game</button>
+  </div>
+
+  <div id="game-area">
     <div class="board" id="board"></div>
     <p id="status">Player X's turn</p>
-    <button onclick="resetGame()">Reset</button><script>
+    <button onclick="resetGame()">Reset</button>
+  </div>
+
+  <script>
     const board = document.getElementById("board");
     const status = document.getElementById("status");
-    let cells = [];
+    const gameArea = document.getElementById("game-area");
+    let playerXName = "Player X";
+    let playerOName = "Player O";
     let currentPlayer = "X";
+    let cells = [];
     let gameState = ["", "", "", "", "", "", "", "", ""];
     const winPatterns = [
-        [0, 1, 2], [3, 4, 5], [6, 7, 8],
-        [0, 3, 6], [1, 4, 7], [2, 5, 8],
-        [0, 4, 8], [2, 4, 6]
+      [0, 1, 2], [3, 4, 5], [6, 7, 8],
+      [0, 3, 6], [1, 4, 7], [2, 5, 8],
+      [0, 4, 8], [2, 4, 6]
     ];
 
+    function startGame() {
+      const nameX = document.getElementById("playerX").value.trim();
+      const nameO = document.getElementById("playerO").value.trim();
+      if (nameX !== "") playerXName = nameX;
+      if (nameO !== "") playerOName = nameO;
+      currentPlayer = "X";
+      gameState = ["", "", "", "", "", "", "", "", ""];
+      status.innerText = `${playerXName}'s turn`;
+      gameArea.style.display = "block";
+      createBoard();
+    }
+
     function createBoard() {
-        board.innerHTML = "";
-        cells = [];
-        gameState.forEach((cell, index) => {
-            const div = document.createElement("div");
-            div.classList.add("cell");
-            div.dataset.index = index;
-            div.addEventListener("click", handleMove);
-            board.appendChild(div);
-            cells.push(div);
-        });
+      board.innerHTML = "";
+      cells = [];
+      gameState.forEach((cell, index) => {
+        const div = document.createElement("div");
+        div.classList.add("cell");
+        div.dataset.index = index;
+        div.addEventListener("click", handleMove);
+        board.appendChild(div);
+        cells.push(div);
+      });
     }
 
     function handleMove(event) {
-        const index = event.target.dataset.index;
-        if (gameState[index] !== "" || checkWinner()) return;
-        gameState[index] = currentPlayer;
-        event.target.innerText = currentPlayer;
-        event.target.classList.add("taken");
-        if (checkWinner()) {
-            `status.innerText = Player ${currentPlayer} wins!;`
-            return;
-        }
-        currentPlayer = currentPlayer === "X" ? "O" : "X";
-        `status.innerText = Player ${currentPlayer}'s turn;`
+      const index = event.target.dataset.index;
+      if (gameState[index] !== "" || checkWinner() || isDraw()) return;
+
+      gameState[index] = currentPlayer;
+      event.target.innerText = currentPlayer;
+      event.target.classList.add("taken");
+
+      if (checkWinner()) {
+        const winnerName = currentPlayer === "X" ? playerXName : playerOName;
+        status.innerText = `${winnerName} wins! 🎉`;
+        return;
+      }
+
+      if (isDraw()) {
+        status.innerText = "It's a draw!";
+        return;
+      }
+
+      currentPlayer = currentPlayer === "X" ? "O" : "X";
+      const nextPlayerName = currentPlayer === "X" ? playerXName : playerOName;
+      status.innerText = `${nextPlayerName}'s turn`;
     }
 
     function checkWinner() {
-        return winPatterns.some(pattern => {
-            const [a, b, c] = pattern;
-            return gameState[a] && gameState[a] === gameState[b] && gameState[a] === gameState[c];
-        });
+      return winPatterns.some(pattern => {
+        const [a, b, c] = pattern;
+        return gameState[a] && gameState[a] === gameState[b] && gameState[a] === gameState[c];
+      });
+    }
+
+    function isDraw() {
+      return gameState.every(cell => cell !== "") && !checkWinner();
     }
 
     function resetGame() {
-        gameState = ["", "", "", "", "", "", "", "", ""];
-        currentPlayer = "X";
-        status.innerText = "Player X's turn";
-        createBoard();
+      gameState = ["", "", "", "", "", "", "", "", ""];
+      currentPlayer = "X";
+      const nextPlayerName = currentPlayer === "X" ? playerXName : playerOName;
+      status.innerText = `${nextPlayerName}'s turn`;
+      createBoard();
     }
+  </script>
 
-    createBoard();
-</script>
 </body>
 </html>
